@@ -68,7 +68,7 @@ namespace Taschenrechner
         {
             string eingabe;
             double zahl = 0;
-            Console.Write("Bitte gib eine weitere Zahl ein (FERTIG zum Beenden): ");
+            Console.Write("Bitte gib eine weitere Zahl ein (Tippe FERTIG zum Beenden): ");
             eingabe = Console.ReadLine();
 
             if (eingabe.ToUpper() == "FERTIG")
