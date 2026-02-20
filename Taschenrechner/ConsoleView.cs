@@ -46,53 +46,57 @@ namespace Taschenrechner
 
         public void HoleEingabenFuerFortlaufendeBerechnung()
         {
-
-
             model.ErsteZahl = model.Resultat;
-            do
+
+            while (true)
             {
-                double eingabe = HoleNaechsteAktionVomBenutzer();
-                model.ZweiteZahl = Convert.ToDouble(eingabe);
-                if (model.AktuellerFehler == Fehler.GrenzwertUeberschreitung)
+                Console.Write("Bitte gib eine weitere Zahl ein (oder einen Operator, oder FERTIG zum Beenden): ");
+                string eingabe = Console.ReadLine();
+
+                if (eingabe == null || eingabe.ToUpper() == "FERTIG")
                 {
-                    Console.WriteLine("FEHLER: Zahl muss größer als {0} und kleiner als {1} sein.", RechnerModel.UntererGrenzwert, RechnerModel.ObererGrenzwert);
+                    BenutzerWillBeenden = true;
+                    return;
                 }
-            }
-            while (model.AktuellerFehler == Fehler.GrenzwertUeberschreitung);
 
-
-
-        }
-
-        private double HoleNaechsteAktionVomBenutzer()
-        {
-            string eingabe;
-            double zahl = 0;
-            Console.Write("Bitte gib eine weitere Zahl ein (Tippe FERTIG zum Beenden): ");
-            eingabe = Console.ReadLine();
-
-            if (eingabe.ToUpper() == "FERTIG")
-            {
-                BenutzerWillBeenden = true;
-            }
-
-            else
-            {
-                while (!double.TryParse(eingabe, out zahl))
+                // Versuch, die Eingabe als Zahl zu parsen
+                if (double.TryParse(eingabe, out double zahl))
                 {
-                    Console.WriteLine();
-                    Console.WriteLine(" Du musst eine gültige Gleitkommazahl eingeben!");
-                    Console.WriteLine("Neben den Ziffern 0-9 sind lediglich die folgenden Sonderzeichen erlaubt: ,.-");
-                    Console.WriteLine("Dabei muss das - als erstes Zeichen vor einer Ziffer gesetzt werden.");
-                    Console.WriteLine("Der . fungiert als Trennzeichen an Tausenderstellen.");
-                    Console.WriteLine("Das , ist das Trennzeichen für die Nachkommastellen.");
-                    Console.WriteLine("Alle drei Sonderzeichen sind optional!");
-                    Console.WriteLine();
-                    Console.Write("Bitte gib erneut eine Zahl für die Berechnung ein: ");
-                    eingabe = Console.ReadLine();
+                    model.ZweiteZahl = zahl;
+                    if (model.AktuellerFehler == Fehler.GrenzwertUeberschreitung)
+                    {
+                        Console.WriteLine("FEHLER: Zahl muss größer als {0} und kleiner als {1} sein.", RechnerModel.UntererGrenzwert, RechnerModel.ObererGrenzwert);
+                        continue;
+                    }
+                    // Gültige Zahl, Schleife verlassen um Berechnung durchzuführen
+                    break;
                 }
+
+                // Versuch, die Eingabe als Operator zu interpretieren
+                if (eingabe == "+" || eingabe == "-" || eingabe == "*" || eingabe == "/")
+                {
+                    model.Operation = eingabe;
+                    if (model.AktuellerFehler == Fehler.UngueltigeOperation)
+                    {
+                        Console.WriteLine("FEHLER: Die eingegebene Operation wird nicht unterstützt.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Operation geändert auf {0}.", model.Operation);
+                    }
+                    continue;
+                }
+
+                // Ungültige Eingabe
+                Console.WriteLine();
+                Console.WriteLine("Du musst eine gültige Gleitkommazahl oder einen gültigen Operator eingeben!");
+                Console.WriteLine("Neben den Ziffern 0-9 sind lediglich die folgenden Sonderzeichen erlaubt: ,.-");
+                Console.WriteLine("Dabei muss das - als erstes Zeichen vor einer Ziffer gesetzt werden.");
+                Console.WriteLine("Der . fungiert als Trennzeichen an Tausenderstellen.");
+                Console.WriteLine("Das , ist das Trennzeichen für die Nachkommastellen.");
+                Console.WriteLine("Alle drei Sonderzeichen sind optional!");
+                Console.WriteLine();
             }
-            return Convert.ToDouble(zahl);
         }
 
         private double HoleZahlVomBenutzer()
